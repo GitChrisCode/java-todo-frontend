@@ -29,8 +29,24 @@ function App() {
           })
           .catch(console.error);
   }
+    function changeTodoStatus(todo: Todo, status: string) {
+        todo.status = status;
+        axios.put(`api/todo/${todo.id}`, todo)
+            .then(response => {
+                setTodos(todos.map(todo => todo.id === todo.id ? {...todo, status} : todo));
+            })
+            .catch(console.error);
+    }
 
-  return (
+    function deleteTodo(id: string) {
+        axios.delete(`api/todo/${id}`)
+            .then(response => {
+                setTodos(todos.filter(todo =>todo.id !== id));
+            })
+             .catch(console.error);
+    }
+
+    return (
     <div>
       <h1>Super Duper Kanban</h1>
       <form onSubmit={event => {event.preventDefault();postTodo();}}>
@@ -43,21 +59,25 @@ function App() {
                 <h4>ToDo</h4>
                 <ul>
                         {todos.filter(todos => todos.status.includes("OPEN")).map(todo => (
-                        <li key={todo.id}>{todo.description} - {todo.status}</li>))}
+                        <li key={todo.id}>{todo.description} - {todo.status}
+                            <button onClick={() => changeTodoStatus(todo, "IN_PROGRESS")}>Advance</button>
+                        </li>))}
                 </ul>
             </div>
             <div className={"Doing"}>
                 <h4>Doing</h4>
                 <ul>
                         {todos.filter(todos => todos.status.includes("IN_PROGRESS")).map(todo => (
-                        <li key={todo.id}>{todo.description} - {todo.status}</li>))}
+                        <li key={todo.id}>{todo.description} - {todo.status}
+                            <button onClick={() => changeTodoStatus(todo, "DONE")}>Advance</button></li>))}
                 </ul>
             </div>
             <div className={"Done"}>
                 <h4>Done</h4>
                 <ul>
                         {todos.filter(todos => todos.status.includes("DONE")).map(todo => (
-                        <li key={todo.id}>{todo.description} - {todo.status}</li>))}
+                        <li key={todo.id}>{todo.description} - {todo.status}
+                            <button onClick={() => deleteTodo(todo.id)}>Delete</button></li>))}
                 </ul>
             </div>
         </div>
